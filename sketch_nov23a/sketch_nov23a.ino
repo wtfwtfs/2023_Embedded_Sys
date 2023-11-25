@@ -14,20 +14,86 @@
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 SoftwareSerial bluetooth(BT_RX, BT_TX);
 MFRC522 rc522(SS_PIN, RST_PIN);
-
 Servo SG90;
 
 /*
-  0 - locked
-  1 - opened
+  0 - normal
+  1 - password_input
   2 - intruder!!!!
+  3 - register
 */
 int mode = 0;
 
+/*
+  사용자 인증 여부, 문 열림 여부
+*/
 bool isAuthor = false;
 bool isDoorOpened = false;
+bool isLightOn = false;
 
 int sg90 = 6;
+byte readDT[4];
+
+void read_ble(){
+  if(bluetooth.available()){
+    switch(bluetooth.read()){
+      case 'a' :
+        mode = 1;
+        break;
+
+      case 'b' :
+        mode = 2;
+        break;
+    }
+  }
+}
+
+void register_card(){
+  mode = 3;
+
+  Serial.println("Register your Card : ");
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Register");
+  lcd.setCursor(0,1);
+  lcd.print("Your Card");
+
+  while(1){
+    if ( rc522.PICC_IsNewCardPresent() && rc522.PICC_ReadCardSerial() ) { 
+      readDT[0] = rc522.uid.uidByte[0];
+      readDT[1] = rc522.uid.uidByte[1];
+      readDT[2] = rc522.uid.uidByte[2];
+      readDT[3] = rc522.uid.uidByte[3];
+
+      Serial.println("Registered!");
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Card Registered!");
+
+      delay(3000);
+      mode = 0;
+      break;
+    }
+  }
+}
+
+void send_status(){
+  if(mode == 2){
+    bluetooth.write(500);
+    Serial.println("Status : intruder alert!");
+  }
+  else if(mode == 0 && isAuthor && isDoorOpened){
+    bluetooth.write(600);
+    Serial.println("Status : Door is Opened, Be careful!");
+  }
+  else if(mode == 0 && isAuthor && !isDoorOpened){
+    bluetooth.write(700);
+    Serial.println("Status : Door is Locked");
+  }
+  else{
+    bluetooth.write(800);
+  }
+}
 
 void show_status(){
   lcd.clear();
@@ -57,7 +123,6 @@ void open(){
     delay(5);
   }
   delay(500);
-  mode = 1;
   isDoorOpened = true;
 
 }
@@ -68,7 +133,6 @@ void close(){
     delay(5);
   }
   delay(500);
-  mode = 0;
   isDoorOpened = false;
 
 }
@@ -84,10 +148,11 @@ void intruder_alert(){
   mode = 2;
 
   while(1){
+    send_status();
      if ( rc522.PICC_IsNewCardPresent() && rc522.PICC_ReadCardSerial() ) { 
       //카드 또는 ID 가 읽히지 않으면 return을 통해 다시 시작하게 됩니다.
-      if(rc522.uid.uidByte[0]==0xA3 && rc522.uid.uidByte[1]==0x88 && rc522.uid.uidByte[2]==0x1A 
-      && rc522.uid.uidByte[3]==0x0F) {
+      if(rc522.uid.uidByte[0]==readDT[0] && rc522.uid.uidByte[1]==readDT[1] && rc522.uid.uidByte[2]==readDT[2] 
+      && rc522.uid.uidByte[3]==readDT[3]) {
         isAuthor = true;
         if(!isDoorOpened){
           open();
@@ -106,15 +171,14 @@ void waiting(){
   while(1){
     if ( rc522.PICC_IsNewCardPresent() && rc522.PICC_ReadCardSerial() ) { 
       //카드 또는 ID 가 읽히지 않으면 return을 통해 다시 시작하게 됩니다.
-      if(rc522.uid.uidByte[0]==0xA3 && rc522.uid.uidByte[1]==0x88 && rc522.uid.uidByte[2]==0x1A 
-      && rc522.uid.uidByte[3]==0x0F) {  // 여기에 CARD UID 를 자신의 카드에 맞는 값으로 변경해주세요
+      if(rc522.uid.uidByte[0]==readDT[0] && rc522.uid.uidByte[1]==readDT[1] && rc522.uid.uidByte[2]==readDT[2]
+      && rc522.uid.uidByte[3]==readDT[3]) {  // 여기에 CARD UID 를 자신의 카드에 맞는 값으로 변경해주세요
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("Authenticated");
-
+        mode = 0;
         isAuthor = true;
-
-        if(mode == 0){
+        if(!isDoorOpened){
           open();
         }
         else {
@@ -148,11 +212,14 @@ void setup()
   lcd.init();
   // I2C LCD의 백라이트를 켜줍니다.
   lcd.backlight();
+  close(); // 문이 잠긴 상태로 시작합니다.
+  register_card();
 }
 
 void loop()
 {
   waiting();
+  send_status();
     // if(bluetooth.available()){
     //   Serial.write(bluetooth.read());
     //   mode = 1;

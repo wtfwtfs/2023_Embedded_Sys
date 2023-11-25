@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.example.mymp3'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.mymp3"
