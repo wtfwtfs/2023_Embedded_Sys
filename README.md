@@ -16,6 +16,9 @@
 8. 카드 재등록
 9. 물리적으로 버저 소리 줄이고 키우기
 
+## 영상
+https://youtu.be/xnRmId1V8y8
+
 ## 참고
 https://m.blog.naver.com/PostView.naver?blogId=intopion&logNo=221613937290&proxyReferer=
 https://bugwhale.tistory.com/m/entry/android-bluetooth-application
