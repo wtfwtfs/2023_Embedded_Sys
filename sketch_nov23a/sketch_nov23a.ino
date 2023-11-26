@@ -23,6 +23,7 @@ Servo SG90;
   1 - password_input
   2 - intruder!!!!
   3 - register
+  4 - set password
 */
 int mode = 0;
 
@@ -37,6 +38,8 @@ bool isLightOn = false;
   RFID를 저장할 버퍼
 */
 byte readDT[4];
+char pwd[4];
+char pwd_input[4];
 
 void light_handler(){
   if(mode == 2){ // 침입자 경계중일 경우 -> LED 깜박깜박, delay로 인해 버저도 간격을 두고 울리도록 설계
@@ -86,7 +89,11 @@ void register_card(){
 }
 
 void send_status(){ 
-  if(mode == 2){
+  if(mode == 1){
+    bluetooth.write("P"); // 현재 비밀번호 입력받는 중
+    delay(100);
+  }
+  else if(mode == 2){
     bluetooth.write("I"); // 현재 칩입자 발생
     delay(100);
     //Serial.println("Status : intruder alert!");
@@ -163,10 +170,17 @@ void intruder_alert(){
   isAuthor = false;
   mode = 2;
 
-  while(1){
-    send_status(); // 현재상태를 앱에 보냅니다.
+  while(!isAuthor){
+    send_status(); // 현재 상태를 앱에 보냅니다.
 
-     if ( rc522.PICC_IsNewCardPresent() && rc522.PICC_ReadCardSerial() ) { 
+    if(bluetooth.available() && bluetooth.read() == 'p'){
+      getPwd();
+      if(isAuthor){
+        break;
+      }
+    }
+
+    if ( rc522.PICC_IsNewCardPresent() && rc522.PICC_ReadCardSerial() ) { 
       //카드 또는 ID 가 읽히지 않으면 return을 통해 다시 시작하게 됩니다.
       if(rc522.uid.uidByte[0]==readDT[0] && rc522.uid.uidByte[1]==readDT[1] && rc522.uid.uidByte[2]==readDT[2] 
       && rc522.uid.uidByte[3]==readDT[3]) {
@@ -185,6 +199,78 @@ void intruder_alert(){
   while(bluetooth.available()){ // 혹시 침입자 알림이 뜬 동안의 블루투스로 들어온 요청은 모두 제거합니다.
     bluetooth.read();
   }
+}
+
+void getPwd(){
+  mode = 1;
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Password input...");
+
+  int count = 0;
+  bool isIntruder = false;
+  while (count < 4){
+    if(bluetooth.available()){
+      lcd.setCursor(count, 1);
+      pwd_input[count] = bluetooth.read();
+      lcd.print(pwd_input[count]);
+      count++;
+    }
+  }
+  for(int i = 0; i < 4; i++){
+    if(pwd[i] != pwd_input[i]){
+      isIntruder = true;
+      break;
+    }
+  }
+
+  if(isIntruder){
+    intruder_alert();
+    isAuthor = true;
+    show_status();
+  }
+  else if(!isDoorOpened){
+    isAuthor = true;
+    open();
+    show_status();
+  }
+  else{
+    isAuthor = true;
+    close();
+    show_status();
+  }
+
+  mode = 0;
+}
+
+void setPwd(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Enter New Pwd(4) : ");
+
+  int count = 0;
+  while (count < 4){
+    if(bluetooth.available()){
+      lcd.setCursor(count, 1);
+      pwd_input[count] = bluetooth.read();
+      lcd.print(pwd_input[count]);
+      count++;
+    }
+  }
+
+  for(int i = 0; i < 4; i++){
+    pwd[i] = pwd_input[i];
+  }
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Pwd set with : ");
+
+  lcd.setCursor(0,1);
+  lcd.print(pwd_input);
+  delay(2000);
+
+  show_status();
 }
 
 void waiting(){
@@ -242,7 +328,7 @@ void read_ble(){ // 블루투스로 전달 받은 글자에 따른 처리
 
       case 'c' :
         if (isDoorOpened){ // 문이 열려있다면 문을 닫고 상태 출력
-          light_handler();
+          close();
           show_status();
         }
         break;
@@ -261,6 +347,14 @@ void read_ble(){ // 블루투스로 전달 받은 글자에 따른 처리
           digitalWrite(LED_PIN, LOW);
         }
         //show_status();
+        break;
+
+      case 'p' :
+        getPwd();
+        break;
+      
+      case 's' :
+        setPwd();
         break;
     }
   }
@@ -282,6 +376,10 @@ void setup()
   lcd.init();
   // I2C LCD의 백라이트를 켜줍니다.
   lcd.backlight();
+  pwd[0] = 'a';
+  pwd[1] = 'b';
+  pwd[2] = 'c';
+  pwd[3] = 'd';
 
   close(); // 문이 잠긴 상태로 시작합니다.
   digitalWrite(LED_PIN, LOW);
