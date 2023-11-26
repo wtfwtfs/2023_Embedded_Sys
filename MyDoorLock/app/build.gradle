@@ -8,8 +8,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.mydoorlock"
-        minSdk 33
-        targetSdk 33
+        minSdk 30
+        targetSdk 30
         versionCode 1
         versionName "1.0"
 
@@ -26,6 +26,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildToolsVersion '34.0.0'
+    ndkVersion '23.1.7779620'
 }
 
 dependencies {
