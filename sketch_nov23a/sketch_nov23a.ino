@@ -266,8 +266,10 @@ void setPwd(){
   lcd.setCursor(0,0);
   lcd.print("Pwd set with : ");
 
-  lcd.setCursor(0,1);
-  lcd.print(pwd_input);
+  for(int i = 0; i < sizeof(pwd); i++){
+    lcd.setCursor(i, 1);
+    lcd.print(pwd[i]);
+  }
   delay(2000);
 
   show_status();
