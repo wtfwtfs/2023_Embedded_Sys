@@ -22,3 +22,5 @@ https://youtu.be/xnRmId1V8y8
 ## 참고
 https://m.blog.naver.com/PostView.naver?blogId=intopion&logNo=221613937290&proxyReferer=
 https://bugwhale.tistory.com/m/entry/android-bluetooth-application
+https://leevisual.tistory.com/209
+https://popcorn16.tistory.com/192
