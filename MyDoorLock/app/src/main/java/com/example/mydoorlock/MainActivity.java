@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     UUID BT_MODULE_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
 
     TextView textStatus;
-    Button btnParied, btnSearch, btnSend;
+    Button btnParied, btnSearch, btnDial, btnSwitch;
     ListView listView;
 
     BluetoothAdapter btAdapter;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int REQUEST_ENABLE_BT = 1;
     BluetoothSocket btSocket = null;
-    ConnectedThread connectedThread;
+    static ConnectedThread connectedThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         textStatus = (TextView) findViewById(R.id.text_status);
         btnParied = (Button) findViewById(R.id.btn_paired);
         btnSearch = (Button) findViewById(R.id.btn_search);
-        btnSend = (Button) findViewById(R.id.btn_send);
+        btnDial = (Button) findViewById(R.id.btn_dial);
         listView = (ListView) findViewById(R.id.listview);
 
         // Show paired devices
@@ -135,6 +135,16 @@ public class MainActivity extends AppCompatActivity {
     // Send string "s"
     public void onClickButtonSend(View view){
         if(connectedThread!=null){ connectedThread.write("s"); }
+    }
+
+    // 연결 후 dial 선택시 화면 전환, 연결된 디바이스가 없는 경우 메세지 출력
+    public void onClickButtonDial(View view){
+        if(connectedThread != null){
+            Intent intent = new Intent(getApplicationContext(), DialActivity.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(getApplicationContext(), "need a connection", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // Create a BroadcastReceiver for ACTION_FOUND.
@@ -211,6 +221,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        return  device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
+        return device.createRfcommSocketToServiceRecord(BT_MODULE_UUID);
     }
 }
