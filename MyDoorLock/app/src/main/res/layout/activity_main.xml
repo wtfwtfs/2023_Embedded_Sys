@@ -56,25 +56,13 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_search"/>
 
-    <Button
-        android:id="@+id/btn_control"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:onClick="onClickButtonControl"
-        android:text="control"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_dial" />
-
     <ListView
         android:id="@+id/listview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_control" />
+        app:layout_constraintTop_toBottomOf="@id/btn_dial" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,6 +11,7 @@ public class ConnectedThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
+    private boolean isOpen;
 
     public ConnectedThread(BluetoothSocket socket) {
         mmSocket = socket;
@@ -43,6 +44,11 @@ public class ConnectedThread extends Thread {
                     SystemClock.sleep(100); //pause and wait for rest of data. Adjust this depending on your sending speed.
                     bytes = mmInStream.available(); // how many bytes are ready to be read?
                     bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
+                    if(String.valueOf((char) buffer[0]).equals("O")){
+                        isOpen = true;
+                    } else if (String.valueOf((char) buffer[0]).equals("C")){
+                        isOpen = false;
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -50,6 +56,10 @@ public class ConnectedThread extends Thread {
                 break;
             }
         }
+    }
+
+    public boolean isOpen(){
+        return isOpen;
     }
 
     /* Call this from the main activity to send data to the remote device */

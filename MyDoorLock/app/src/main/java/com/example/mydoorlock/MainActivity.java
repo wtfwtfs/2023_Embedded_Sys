@@ -78,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         btnParied = (Button) findViewById(R.id.btn_paired);
         btnSearch = (Button) findViewById(R.id.btn_search);
         btnDial = (Button) findViewById(R.id.btn_dial);
-        btnSwitch = (Button) findViewById(R.id.btn_control);
         listView = (ListView) findViewById(R.id.listview);
 
         // Show paired devices
@@ -142,16 +141,6 @@ public class MainActivity extends AppCompatActivity {
     public void onClickButtonDial(View view){
         if(connectedThread != null){
             Intent intent = new Intent(getApplicationContext(), DialActivity.class);
-            startActivity(intent);
-        } else {
-            Toast.makeText(getApplicationContext(), "need a connection", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // 연결 후 switch 선택시 화면 전환, 연결된 디바이스가 없는 경우 메세지 출력
-    public void onClickButtonControl(View view){
-        if(connectedThread != null){
-            Intent intent = new Intent(getApplicationContext(), SwitchActivity.class);
             startActivity(intent);
         } else {
             Toast.makeText(getApplicationContext(), "need a connection", Toast.LENGTH_SHORT).show();

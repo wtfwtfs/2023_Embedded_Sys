@@ -6,7 +6,7 @@
 #include <Servo.h>   
 
 #define BUZZER_PIN 5
-#define BT_TX 8
+#define BT_TX 8 
 #define BT_RX 7
 #define RST_PIN 9
 #define SS_PIN 10
@@ -271,7 +271,9 @@ void setPwd(){
     lcd.print(pwd[i]);
   }
   delay(2000);
-
+  if(isDoorOpened){
+    close();
+  }
   show_status();
 }
 

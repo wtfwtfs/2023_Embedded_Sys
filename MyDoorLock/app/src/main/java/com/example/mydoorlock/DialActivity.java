@@ -16,8 +16,9 @@ public class DialActivity extends AppCompatActivity {
     ConnectedThread connectedThread = MainActivity.connectedThread;
     TextView enteredPwd, statusText;
     char[] buf = "----".toCharArray();
-
     String outStr = "";
+    String pwd;
+    boolean isOpen;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,6 +27,8 @@ public class DialActivity extends AppCompatActivity {
 
         statusText = findViewById(R.id.text_status);
         enteredPwd = findViewById(R.id.text_pwd);
+
+        statusText.setText("status");
 
         Button[] btnArr = {
                 findViewById(R.id.btn_num0),
@@ -148,6 +151,15 @@ public class DialActivity extends AppCompatActivity {
             } else {
                 connectedThread.write("p");
                 connectedThread.write(outStr);
+                if(outStr.equals(pwd)){
+                    if(connectedThread.isOpen()){
+                        statusText.setText("Door Closed");
+                    } else {
+                        statusText.setText("Door Opened");
+                    }
+                } else {
+                    statusText.setText("Intruder Alert!");
+                }
             }
         } else {
             Toast.makeText(getApplicationContext(), "need a connection", Toast.LENGTH_SHORT).show();
@@ -161,6 +173,8 @@ public class DialActivity extends AppCompatActivity {
             } else {
                 connectedThread.write("s");
                 connectedThread.write(outStr);
+                pwd = outStr;
+                statusText.setText("Door Closed");
             }
         } else {
             Toast.makeText(getApplicationContext(), "need a connection", Toast.LENGTH_SHORT).show();
