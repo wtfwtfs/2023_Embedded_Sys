@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class DialActivity extends AppCompatActivity {
 
     ConnectedThread connectedThread = MainActivity.connectedThread;
-    TextView enteredPwd;
+    TextView enteredPwd, statusText;
     char[] buf = "----".toCharArray();
 
     String outStr = "";
@@ -24,6 +24,7 @@ public class DialActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dial);
 
+        statusText = findViewById(R.id.text_status);
         enteredPwd = findViewById(R.id.text_pwd);
 
         Button[] btnArr = {
@@ -170,14 +171,6 @@ public class DialActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finish();
-    }
-
-    public void setOutStr() {
-        outStr = "";
-        for(int i = 3; i >= 0; i--){
-            outStr += buf[i];
-        }
-        enteredPwd.setText(outStr);
     }
 
     public void setBuf(char c) {

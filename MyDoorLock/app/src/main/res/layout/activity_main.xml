@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <Button
+        android:id="@+id/btn_send3"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="onClickButtonSend"
+        android:text="Send a"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_search" />
+
     <TextView
         android:id="@+id/text_status"
         android:layout_width="wrap_content"
@@ -37,21 +47,34 @@
         app:layout_constraintTop_toBottomOf="@id/btn_paired"/>
 
     <Button
-        android:id="@+id/btn_send"
-        android:text="Send a"
-        android:onClick="onClickButtonSend"
+        android:id="@+id/btn_dial"
+        android:text="Dial"
+        android:onClick="onClickButtonDial"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_search"/>
 
+    <Button
+        android:id="@+id/btn_control"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="onClickButtonControl"
+        android:text="control"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_dial" />
+
     <ListView
         android:id="@+id/listview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_send"/>
+        app:layout_constraintTop_toBottomOf="@id/btn_control" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
